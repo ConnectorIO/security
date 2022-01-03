@@ -43,7 +43,7 @@
     <mockito.version>3.6.28</mockito.version>
 
     <!-- various build related variables -->
-    <feature.directory>${project.basedir}/target/test-classes/feature.xml</feature.directory>
+    <feature.file>${project.basedir}/target/feature/feature.xml</feature.file>
     <osgi.version>7.0.0</osgi.version>
     <log4j2.version>2.14.1</log4j2.version>
   </properties>
@@ -80,6 +80,8 @@
         <groupId>org.connectorio.security</groupId>
         <artifactId>org.connectorio.security.feature</artifactId>
         <version>${project.version}</version>
+        <classifier>features</classifier>
+        <type>xml</type>
       </dependency>
 
       <dependency>
@@ -659,7 +661,7 @@
               <configuration>
                 <artifacts>
                   <artifact>
-                    <file>${feature.directory}</file>
+                    <file>${feature.file}</file>
                     <classifier>features</classifier>
                     <type>xml</type>
                   </artifact>
@@ -668,7 +670,6 @@
             </execution>
           </executions>
         </plugin>
-
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-maven-plugin</artifactId>
@@ -679,46 +680,41 @@
             <startLevel>80</startLevel>
             <enableGeneration>true</enableGeneration>
             <aggregateFeatures>false</aggregateFeatures>
-            <checkDependencyChange>true</checkDependencyChange>
+            <checkDependencyChange>false</checkDependencyChange>
             <failOnDependencyChange>false</failOnDependencyChange>
-            <logDependencyChanges>true</logDependencyChanges>
-            <overwriteChangedDependencies>true</overwriteChangedDependencies>
-            <javase>11</javase>
+            <logDependencyChanges>false</logDependencyChanges>
+            <overwriteChangedDependencies>false</overwriteChangedDependencies>
           </configuration>
           <executions>
-            <!--
             <execution>
-              <id>compile</id>
+              <id>karaf-kar</id>
               <goals>
-                <goal>features-generate-descriptor</goal>
+                <goal>kar</goal>
               </goals>
-              <phase>generate-resources</phase>
-              <configuration>
-                <inputFile>${feature.directory}</inputFile>
-              </configuration>
+              <phase>package</phase>
             </execution>
-            -->
             <execution>
-              <id>karaf-feature-verification</id>
+              <id>karaf-verification</id>
               <goals>
                 <goal>verify</goal>
               </goals>
-              <phase>deploy</phase>
+              <phase>verify</phase>
               <configuration>
                 <descriptors combine.children="append">
                   <!-- Apache Karaf -->
                   <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
                   <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
                   <!-- Current feature under verification -->
-                  <descriptor>file:${feature.directory}</descriptor>
+                  <descriptor>file:${feature.file}</descriptor>
                 </descriptors>
+                <!-- wait till KARAF-7316 to swap it -->
                 <distribution>org.apache.karaf.features:framework</distribution>
                 <javase>11</javase>
                 <framework>
                   <feature>framework</feature>
                 </framework>
-                <features>
-                  <feature>co7io-*</feature>
+                <features combine.children="override">
+                  <feature>_none_</feature>
                 </features>
                 <verifyTransitive>false</verifyTransitive>
                 <ignoreMissingConditions>true</ignoreMissingConditions>
