@@ -19,6 +19,7 @@ package org.connectorio.security.servlet;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Supplier;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,17 +29,21 @@ import org.connectorio.security.CredentialValidator;
 
 public abstract class SecureServlet<R> extends HttpServlet {
 
-  private final AccessCredentialExtractor<HttpServletRequest, R> extractor;
-  private final CredentialValidator<R> validator;
+  private final Supplier<AccessCredentialExtractor<HttpServletRequest, R>> extractor;
+  private final Supplier<CredentialValidator<R>> validator;
 
   protected SecureServlet(AccessCredentialExtractor<HttpServletRequest, R> extractor, CredentialValidator<R> validator) {
+    this(() -> extractor, () -> validator);
+  }
+
+  protected SecureServlet(Supplier<AccessCredentialExtractor<HttpServletRequest, R>> extractor, Supplier<CredentialValidator<R>> validator) {
     this.extractor = extractor;
     this.validator = validator;
   }
 
   @Override
   protected final void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    Optional<R> result = extractor.extract(req, validator);
+    Optional<R> result = extractor.get().extract(req, validator.get());
     if (result.isPresent()) {
       super.service(req, resp);
     } else {
