@@ -29,7 +29,7 @@
 
   <groupId>org.connectorio</groupId>
   <artifactId>security</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ConnectorIO - Security</name>
@@ -45,7 +45,7 @@
     <connection>scm:git:https://github.com/ConnectorIO/security.git</connection>
     <developerConnection>scm:git:git@github.com:ConnectorIO/security.git</developerConnection>
     <url>https://github.com/ConnectorIO/security</url>
-    <tag>security-3.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <licenses>
